@@ -97,15 +97,15 @@ window.addEventListener("DOMContentLoaded", e=>{
     // because the guy adds avatars to the end, these are the newest avatars
     for(var i = searchData.entries.length - 1; i >= 0; i--) {
       const entry = searchData.entries[i];
-      if(names && entry.name && entry.name.includes(query)) {
+      if(names && entry.name && entry.name.toLowerCase().includes(query)) {
         searchMatched(entry);
         continue;
       }
-      if(authors && entry.author && entry.author.includes(query)) {
+      if(authors && entry.author && entry.author.toLowerCase().includes(query)) {
         searchMatched(entry);
         continue;
       }
-      if(descriptions && entry.description && entry.description.includes(query)) {
+      if(descriptions && entry.description && entry.description.toLowerCase().includes(query)) {
         searchMatched(entry);
         continue;
       }
@@ -260,6 +260,18 @@ async function getPrismicObj(url) {
 
   for(var i = 0; i < fileAvatars; i++) {
     var obj = {};
+    const f = flags[i];
+    const avatarFlags = [
+      (f >> 29) & 7, // platform -- 1 pc 2 quest 4 ios
+      (f >> 26) & 7, // also platform (probably impostors)
+      // Unknown rating happens when u have security checks pending or avatar is not uploaded for that platform
+      (f >> 17) & 7, // pc rating (0 unknown 1 excellent 2 good 3 medium 4 poor 5 verypoor)
+      (f >> 20) & 7, // quest rating
+      (f >> 23) & 7, // ios rating
+      (f >> 12) & 31, // unused?
+      (f >> 2) & 1023,
+    ];
+
     const avatarId = decodeAvatarId(avatarIds.slice(i * 16, (i * 16) + 16), dynamicBytes);
     const nameDesc = avatarNames[i].split("\t");
     obj.name = nameDesc[0].split("").reverse().join("");
@@ -270,6 +282,7 @@ async function getPrismicObj(url) {
     avatar_data.idMap.actualMap[avatarId] = obj;
     avatar_data.entries.push(obj);
     obj.avatrId = avatarId;
+    obj.flags = avatarFlags;
   }
 
   return avatar_data;
