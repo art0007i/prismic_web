@@ -2,7 +2,14 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Prismic's Avatar Search</title>
+  <title>Prismic's Avatar Search - Web Edition</title>
+  <meta name="description" content="Prismic's Avatar Search in my web browser? It's more likely than you think!">
+
+  <meta property="og:title" content="Prismic's Avatar Search - Web Edition">
+  <meta property="og:description" content="Prismic's Avatar Search in my web browser? It's more likely than you think!">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://prismic.art0007i.me">
+
   <script src="script.js"></script>
   <link rel="stylesheet" href="style.css">
 </head>
@@ -13,10 +20,14 @@
         <b><span class="avi-name">MyAwesomeAvi</span></b> - <span class="avi-author">CoolGuy</span>
       </p>
       <span class="avi-description">BLahblahblash description be like !!!!</span>
-      <a href="https://example.com" target="_blank"></a>
-      <div class="platforms">
-        <div class="platform pc"></div>
-        <div class="platform quest quest-inactive"></div>
+      <div class="bottom-buttons">
+        <a class="vrcx" href="vrcx://avatar/avatrId"></a>
+        <a class="website" href="https://vrchat.com/home/avatar/avatrId" target="_blank"></a>
+        <div class="platforms">
+          <div class="platform pc" title="Supported on PC"><img src="./assets/plat-pc.svg"></div>
+          <div class="platform quest disabled" title="Supported on Android"><img src="./assets/plat-quest.svg"></div>
+          <div class="platform ios disabled" title="Supported on iOS"><img src="./assets/plat-ios.svg"></div>
+        </div>
       </div>
     </div>
   </template>

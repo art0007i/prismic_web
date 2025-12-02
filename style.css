@@ -111,7 +111,7 @@ body {
 }
 .searchsubmit {
   min-width: 40px;
-  background-image: url("./search.svg");
+  background-image: url("./assets/search.svg");
   background-size: 28px;
   background-position: 4px;
   background-repeat: no-repeat;
@@ -138,44 +138,54 @@ body {
 .grid-item > p {
   margin-top: 0;
 }
-.grid-item > a {
+.bottom-buttons {
   position: absolute;
-  background-image: url("./vrclogo.ico");
-  background-size: cover;
   bottom: 10px;
   right: 10px;
+
+  display: flex;
+  flex-direction: row-reverse;
+  gap: 8px;
+}
+
+.bottom-buttons > a {
   width: 24px;
   height: 24px;
+  background-size: cover;
+}
+.website {
+  background-image: url("./assets/vrclogo.ico");
+}
+.vrcx {
+  background-image: url("./assets/vrcxlogo.ico");
 }
 .platforms{
-  position: absolute;
-  right: 42px;
-  bottom: 10px;
   height: 24px;
-  width: 40px;
-  opacity: 0.5;
+
+  display: flex;
+  gap: 2px;
 }
 .platform {
   border-radius: 50%;
   width: 24px;
-  position: absolute;
   height: 24px;
-  border: 2px solid #fff;
+  border: 1px solid;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.platform > img {
+  height: 16px;
 }
 
 .pc {
-  background-color: rgba(0, 168, 252, 0.733);
-  z-index: 1;
-  left: 0;
+  border-color: #1778ff;
 }
 .quest {
-  background-color: rgb(0, 226, 69);
-  right: 0;
+  border-color: #2bcf5c;
 }
-.quest-inactive {
-  background-color: #888;
-  border: 2px solid #bbb;
-  right: 0;
+.ios {
+  border-color: #ffffff;
 }
 
 .infscroll {
