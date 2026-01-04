@@ -264,16 +264,76 @@ async function getPrismicObj(url) {
   for(var i = 0; i < fileAvatars; i++) {
     var obj = {};
     const f = flags[i];
-    const avatarFlags = [
-      (f >> 29) & 7, // platform -- 1 pc 2 quest 4 ios
-      (f >> 26) & 7, // also platform (probably impostors)
-      // Unknown rating happens when u have security checks pending or avatar is not uploaded for that platform
-      (f >> 17) & 7, // pc rating (0 unknown 1 excellent 2 good 3 medium 4 poor 5 verypoor)
-      (f >> 20) & 7, // quest rating
-      (f >> 23) & 7, // ios rating
-      (f >> 12) & 31, // unused?
-      (f >> 2) & 1023,
-    ];
+/*
+       Platform:
+          1 - PC
+          2 - Quest
+          4 - IOS
+
+       Impostor:
+          1 - PC
+          2 - Quest
+          4 - IOS
+
+       PC Rating:
+          0 - Unknown
+          1 - Excellent
+          2 - Good
+          3 - Medium
+          4 - Poor
+          5 - Very Poor
+
+       Quest Rating:
+          0 - Unknown
+          1 - Excellent
+          2 - Good
+          3 - Medium
+          4 - Poor
+          5 - Very Poor
+
+       IOS Rating:
+          0 - Unknown
+          1 - Excellent
+          2 - Good
+          3 - Medium
+          4 - Poor
+          5 - Very Poor
+
+       Content Warnings:
+          1 - Sexually suggestive
+          2 - Adult Language
+          4 - Graphic Violence
+          8 - Excessive Gore
+          16 - Extreme Horror
+
+        Style Filter:
+          1 - Pop Culture
+          2 - Furry
+          4 - Sci-Fi
+          8 - Anime
+          16 - Cartoon
+          32 - Objects
+          64 - Human
+          128 - Realistic
+          256 - Animal
+          512 - Fantasy
+          1024 - Fashion
+
+        Marketplace:
+          0 - Not in Marketplace
+          1 - In Marketplace
+        */
+
+        const avatarFlags = [
+            (f >> 29) & 7, // Platform
+            (f >> 26) & 7, // Impostor
+            (f >> 17) & 7, // PC Rating
+            (f >> 20) & 7, // Quest Rating
+            (f >> 23) & 7, // IOS Rating
+            (f >> 12) & 31, // Content Warnings
+            (f >> 1) & 2047, // Style Filter
+            (f) & 1 // Marketplace
+        ];
 
     const avatarId = decodeAvatarId(avatarIds.slice(i * 16, (i * 16) + 16), dynamicBytes);
     const nameDesc = avatarNames[i].split("\t");
