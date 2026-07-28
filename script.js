@@ -4,11 +4,11 @@ const urls = [
   "https://gist.githubusercontent.com/Prismic247/930d08f34c61e4282992cdb3afbafca0/raw/pasavtrdb_ios.txt"
 ];
 
-// Unused, also 404
+// Unused
 const backupUrls = [
-  "https://prismic.net/vrc/pasavtrdb.txt",
-  "https://prismic.net/vrc/pasavtrdb_qst.txt",
-  "https://prismic.net/vrc/pasavtrdb.txt" // rip IOS users
+  "https://prismic.net/vrc/pas/pasavtrdb.txt",
+  "https://prismic.net/vrc/pas/pasavtrdb_qst.txt",
+  "https://prismic.net/vrc/pas/pasavtrdb_ios.txt"
 ];
 
 var db;
@@ -227,7 +227,9 @@ async function getPrismicObj(url) {
   
   if(content.data.length == 0) throw new Error("Data has length zero");
   if(String.fromCodePoint(...content.readBytes(3)) !== "PAS") throw new Error("PAS Header not found");
-  var _ = content.readBytes(2); // first byte -> platform (7 pc 4 quest 2 ios), second byte -> no clue, probably format version or sth
+  var metaBytes = content.readBytes(2); // 1st byte: platform and version, 2nd byte: unused???
+  var version = (metaBytes[0] >> 5) & 31;
+  var platform = metaBytes[0] & 7; // 7 = pc, 4 = ios, 2 = qst
   
   avatar_data.avatarCount = content.readInt24();
   avatar_data.authorCount = content.readInt24();
@@ -247,7 +249,12 @@ async function getPrismicObj(url) {
 
   const flagSize = content.readByte();
   const randomBytes = content.readBytes(16);
-  const dynamicBytes = randomBytes.map((e,i)=> e^staticBytes[i]);
+  let dynamicBytes = undefined
+  if (version == 0) {
+    dynamicBytes = randomBytes.map((e,i)=> e^staticBytes[i]);
+  } else {
+    dynamicBytes = randomBytes.map((e,i)=> (e^(staticBytes[(i+version) % 16] + flagSize % 256)));
+  }
   const dataSize = fileAvatars * 16;
   const avatarIds = content.readBytes(dataSize);
   const flagDataSize = fileAvatars * flagSize;
@@ -357,19 +364,32 @@ async function getAuxPrismicObj(url) {
 
   if(content.data.length == 0) throw new Error("Data has length zero");
   if(String.fromCodePoint(...content.readBytes(3)) !== "PAS") throw new Error("PAS Header not found");
+
+  var metaBytes = content.readBytes(2); // 1st byte: platform and version, 2nd byte: unused???
+  var version = (metaBytes[0] >> 5) & 31;
+  var platform = metaBytes[0] & 7; // 7 = pc, 4 = ios, 2 = qst
+
   var _ = content.readBytes(
-    2 //platform 
     + 3 //avatars
     + 3 //authors
     + 2 //date
   );
+
   var fileAvatars = content.readInt24();
   var _ = content.readBytes(
     3 // fileAuthors
-    + 1 // flagSize
   );
+  var flagSize = content.readByte();
   var ids = new Array(fileAvatars)
-  var dynamicBytes = content.readBytes(16).map((e,i)=> e^staticBytes[i]);
+
+  const randomBytes = content.readBytes(16);
+  let dynamicBytes = undefined
+  if (version == 0) {
+    dynamicBytes = randomBytes.map((e,i)=> e^staticBytes[i]);
+  } else {
+    dynamicBytes = randomBytes.map((e,i)=> (e^(staticBytes[(i+version) % 16] + flagSize % 256)));
+  }
+
   var avatarIds = content.readBytes(fileAvatars * 16);
   for (var i = 0; i < fileAvatars; i++) {
     ids[i] = decodeAvatarId(avatarIds.slice(i*16,(i*16)+16), dynamicBytes);
@@ -486,7 +506,7 @@ function getData(storeName, key) {
   });
 }
 
-const request = indexedDB.open('prismic_database', 3);
+const request = indexedDB.open('prismic_database', 4);
 
 request.onupgradeneeded = function(event) {
   const db = event.target.result;
